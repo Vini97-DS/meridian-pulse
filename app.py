@@ -17,7 +17,9 @@ except Exception as e:
     st.stop()
 
 # 2. UX & UI CUSTOMIZADA (PADRÃO MERIDIAN)
-def apply_custom_style(primary_color="#0D1B2E", secondary_color="#C5A059", text_color="#FFFFFF"):
+# MELHORIA 1: Adicionado parâmetro logo_url — renderiza o logo no topo via HTML se informado
+def apply_custom_style(primary_color="#0D1B2E", secondary_color="#C5A059", text_color="#FFFFFF", logo_url=None):
+    logo_html = f'<img src="{logo_url}" style="height:60px; margin-bottom:1rem; display:block;">' if logo_url else ""
     st.markdown(f"""
         <style>
         .stApp, [data-testid="stHeader"] {{ background-color: {primary_color} !important; }}
@@ -28,6 +30,7 @@ def apply_custom_style(primary_color="#0D1B2E", secondary_color="#C5A059", text_
         footer {{visibility: hidden;}}
         header {{visibility: block !important;}}
         </style>
+        {logo_html}
     """, unsafe_allow_html=True)
 
 # 3. LÓGICA DE SLOTS (OCULTA OCUPADOS)
@@ -89,7 +92,12 @@ def dashboard():
     user_id = st.session_state.user.id
     profile = supabase.table("profiles").select("*").eq("id", user_id).single().execute().data
     
-    apply_custom_style(primary_color=profile['primary_color'], secondary_color=profile['secondary_color'])
+    # MELHORIA 1: Passa logo_url para o estilo — se não houver logo cadastrado, nenhuma quebra
+    apply_custom_style(
+        primary_color=profile['primary_color'],
+        secondary_color=profile['secondary_color'],
+        logo_url=profile.get('logo_url')
+    )
     
     st.sidebar.title(f"MERIDIAN | {profile['business_name']}")
     menu = st.sidebar.radio("Insights & Gestão", ["📊 Performance", "🛠 Serviços", "📅 Agenda", "⚙️ Configurações"])
@@ -165,8 +173,16 @@ def dashboard():
             fim = c2.text_input("Fim (HH:MM)", value=profile.get('work_end', '18:00'))
             cp = st.color_picker("Cor Primária", value=profile['primary_color'])
             cs = st.color_picker("Cor Secundária", value=profile['secondary_color'])
+            # MELHORIA 1: Campo para URL do logo — opcional, não quebra perfis sem logo
+            logo = st.text_input("URL do Logo", value=profile.get('logo_url') or "", placeholder="https://...")
             if st.form_submit_button("Atualizar Business Plan"):
-                supabase.table("profiles").update({"work_start": inicio, "work_end": fim, "primary_color": cp, "secondary_color": cs}).eq("id", user_id).execute()
+                supabase.table("profiles").update({
+                    "work_start": inicio,
+                    "work_end": fim,
+                    "primary_color": cp,
+                    "secondary_color": cs,
+                    "logo_url": logo if logo else None
+                }).eq("id", user_id).execute()
                 st.success("Operação atualizada!")
                 st.rerun()
 
@@ -174,7 +190,8 @@ def dashboard():
 def public_booking_page(slug):
     emp = supabase.table("profiles").select("*").eq("slug", slug).single().execute().data
     if not emp: return st.error("Empresa não encontrada.")
-    apply_custom_style(emp['primary_color'], emp['secondary_color'])
+    # MELHORIA 1: Passa logo_url para o estilo da página pública
+    apply_custom_style(emp['primary_color'], emp['secondary_color'], logo_url=emp.get('logo_url'))
 
     st.title(emp['business_name'])
     svcs = supabase.table("services").select("*").eq("business_id", emp['id']).execute().data
