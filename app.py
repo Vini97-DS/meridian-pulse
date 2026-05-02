@@ -154,10 +154,10 @@ def dashboard():
     )
 
     st.sidebar.title(f"MERIDIAN | {profile['business_name']}")
-    menu = st.sidebar.radio("Insights & Gestão", ["📊 Performance", "🛠 Serviços", "📅 Agenda", "📍 Locais", "⚙️ Configurações"])
+    menu = st.sidebar.radio("Insights & Gestão", ["Performance", "Serviços", "Agenda", "Locais", "Configurações"])
 
     # ── PERFORMANCE ──────────────────────────
-    if menu == "📊 Performance":
+    if menu == "Performance":
         st.title("Business Intelligence")
 
         appointments = supabase.table("appointments") \
@@ -182,7 +182,7 @@ def dashboard():
         st.info("💡 Dica Meridian: Sua meta de ocupação para expansão deve ser > 80%.")
 
     # ── SERVIÇOS ─────────────────────────────
-    elif menu == "🛠 Serviços":
+    elif menu == "Serviços":
         st.title("Gestão de Portfólio")
         col_f, col_l = st.columns([1, 2])
         with col_f:
@@ -205,7 +205,7 @@ def dashboard():
                         st.rerun()
 
     # ── AGENDA ───────────────────────────────
-    elif menu == "📅 Agenda":
+    elif menu == "Agenda":
         st.title("Fluxo de Atendimento")
         data = supabase.table("appointments") \
             .select("created_at, appointment_time, payment_method, location_id, clients(full_name, phone), services(name, duration_minutes)") \
@@ -234,7 +234,7 @@ def dashboard():
             st.info("Nenhum agendamento.")
 
     # ── LOCAIS (MELHORIA 3) ──────────────────
-    elif menu == "📍 Locais":
+    elif menu == "Locais":
         st.title("Gestão de Locais de Atendimento")
         st.info("💡 Locais compartilhados bloqueiam automaticamente a agenda de todas as profissionais vinculadas pelo mesmo código.")
 
@@ -283,11 +283,11 @@ def dashboard():
                     st.warning("Informe o nome do local.")
 
     # ── CONFIGURAÇÕES ────────────────────────
-    elif menu == "⚙️ Configurações":
+    elif menu == "Configurações":
         st.title("Configurações do Negócio")
 
         # ── Informações do Negócio ──
-        st.subheader("🏢 Informações do Negócio")
+        st.subheader("Informações do Negócio")
         with st.form("config_negocio"):
             business_name = st.text_input("Nome do Negócio", value=profile.get('business_name') or "")
             bio = st.text_area(
@@ -312,7 +312,7 @@ def dashboard():
         st.divider()
 
         # ── Identidade Visual ──
-        st.subheader("🎨 Identidade Visual")
+        st.subheader("Identidade Visual")
         with st.form("config_visual"):
             cp   = st.color_picker("Cor Primária",   value=profile['primary_color'])
             cs   = st.color_picker("Cor Secundária", value=profile['secondary_color'])
@@ -329,7 +329,7 @@ def dashboard():
         st.divider()
 
         # ── Horários de Atendimento ──
-        st.subheader("🕐 Horários de Atendimento")
+        st.subheader("Horários de Atendimento")
         with st.form("config_horarios"):
             c1, c2 = st.columns(2)
             inicio      = c1.text_input("Início (HH:MM)", value=profile.get('work_start', '08:00'))
@@ -350,7 +350,7 @@ def dashboard():
         st.divider()
 
         # ── Atendimento Online ──
-        st.subheader("💻 Atendimento Online")
+        st.subheader("Atendimento Online")
         with st.form("config_online"):
             online_enabled = st.checkbox(
                 "Oferecer atendimento online",
@@ -367,7 +367,7 @@ def dashboard():
         st.divider()
 
         # ── Taxa de Sinal ──
-        st.subheader("💰 Taxa de Sinal")
+        st.subheader("Taxa de Sinal")
         with st.form("config_sinal"):
             deposit_amount = st.number_input(
                 "Valor do Sinal (R$)",
