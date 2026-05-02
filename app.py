@@ -126,7 +126,7 @@ def dashboard():
         total_clientes = len(appointments) if appointments else 0
         
         col1, col2, col3 = st.columns(3)
-        col1.metric("Receita Projetada", f"CAD {total_receita:,.2f}")
+        col1.metric("Receita Projetada", f"R$ {total_receita:,.2f}")
         col2.metric("Base de Clientes", total_clientes)
         
         # Ocupação Hoje (Estimada sobre 8h de trabalho)
@@ -146,7 +146,7 @@ def dashboard():
         with col_f:
             with st.form("svc_add", clear_on_submit=True):
                 n = st.text_input("Nome")
-                p = st.number_input("Preço (CAD)")
+                p = st.number_input("Preço (R$)")
                 d = st.number_input("Duração (Min)", value=30)
                 if st.form_submit_button("Adicionar à Operação"):
                     supabase.table("services").insert({"business_id": user_id, "name": n, "price": p, "duration_minutes": d}).execute()
@@ -155,7 +155,7 @@ def dashboard():
             svcs = supabase.table("services").select("*").eq("business_id", user_id).execute().data
             if svcs:
                 for s in svcs:
-                    st.write(f"**{s['name']}** - CAD {s['price']}")
+                    st.write(f"**{s['name']}** - R$ {s['price']}")
                     if st.button("Excluir", key=f"d_{s['id']}"):
                         supabase.table("services").delete().eq("id", s['id']).execute()
                         st.rerun()
@@ -210,7 +210,7 @@ def public_booking_page(slug):
     svcs = supabase.table("services").select("*").eq("business_id", emp['id']).execute().data
     if not svcs: return st.warning("Sem serviços disponíveis.")
 
-    s_map = {f"{s['name']} (CAD {s['price']})": s for s in svcs}
+    s_map = {f"{s['name']} (R$ {s['price']})": s for s in svcs}
     escolha = st.selectbox("O que deseja agendar?", list(s_map.keys()))
     servico = s_map[escolha]
 
