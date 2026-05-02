@@ -24,7 +24,7 @@ except Exception as e:
 # MELHORIA 1: logo_url opcional — sem logo, sem quebra
 # ─────────────────────────────────────────────
 def apply_custom_style(primary_color="#0D1B2E", secondary_color="#C5A059", text_color="#FFFFFF", logo_url=None):
-    logo_html = f'<img src="{logo_url}" style="height:60px; margin-bottom:1rem; display:block;">' if logo_url else ""
+    # CSS separado do logo
     st.markdown(f"""
         <style>
         .stApp, [data-testid="stHeader"] {{ background-color: {primary_color} !important; }}
@@ -35,8 +35,11 @@ def apply_custom_style(primary_color="#0D1B2E", secondary_color="#C5A059", text_
         footer {{visibility: hidden;}}
         header {{visibility: block !important;}}
         </style>
-        {logo_html}
     """, unsafe_allow_html=True)
+    
+    # Logo em chamada separada
+    if logo_url:
+        st.markdown(f'<img src="{logo_url}" style="height:60px; margin-bottom:1rem; display:block;">', unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────
 # 3. LÓGICA DE SLOTS
