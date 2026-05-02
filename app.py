@@ -18,7 +18,7 @@ except Exception as e:
 
 # 2. UX & UI CUSTOMIZADA (PADRÃO MERIDIAN)
 # MELHORIA 1: Adicionado parâmetro logo_url — renderiza o logo no topo via HTML se informado
-def apply_custom_style(primary_color="#0D1B2E", secondary_color="#C0C2C9", text_color="#FFFFFF", logo_url=None):
+def apply_custom_style(primary_color="#0D1B2E", secondary_color="#C5A059", text_color="#FFFFFF", logo_url=None):
     logo_html = f'<img src="{logo_url}" style="height:60px; margin-bottom:1rem; display:block;">' if logo_url else ""
     st.markdown(f"""
         <style>
