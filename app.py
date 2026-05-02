@@ -34,23 +34,36 @@ def apply_custom_style(primary_color="#0D1B2E", secondary_color="#C5A059", text_
     """, unsafe_allow_html=True)
 
 # 3. LÓGICA DE SLOTS (OCULTA OCUPADOS)
+# MELHORIA 2: Busca duração de cada agendamento existente e bloqueia
 def get_available_slots(business_id, date_selected, duration):
     try:
         p_res = supabase.table("profiles").select("*").eq("id", business_id).single().execute()
         p = p_res.data
         start_t = p.get('work_start', '08:00')
         end_t = p.get('work_end', '18:00')
-        
-        existing = supabase.table("appointments").select("appointment_time").eq("business_id", business_id).gte("appointment_time", f"{date_selected}T00:00").lte("appointment_time", f"{date_selected}T23:59").execute().data
-        busy_times = [a['appointment_time'].split('T')[1][:5] for a in existing]
+
+        existing = supabase.table("appointments") \
+            .select("appointment_time, services(duration_minutes)") \
+            .eq("business_id", business_id) \
+            .gte("appointment_time", f"{date_selected}T00:00") \
+            .lte("appointment_time", f"{date_selected}T23:59") \
+            .execute().data
+
+        # Monta set de todos os minutos ocupados no dia
+        busy_minutes = set()
+        for a in existing:
+            a_start = datetime.fromisoformat(a['appointment_time'].replace("Z", "+00:00")).replace(tzinfo=None)
+            a_duration = a['services']['duration_minutes']
+            for i in range(0, a_duration, 30):
+                busy_minutes.add((a_start + timedelta(minutes=i)).strftime("%H:%M"))
 
         slots = []
         current = datetime.combine(date_selected, time.fromisoformat(start_t))
         work_end = datetime.combine(date_selected, time.fromisoformat(end_t))
-        
+
         while current + timedelta(minutes=duration) <= work_end:
             time_str = current.strftime("%H:%M")
-            if time_str not in busy_times:
+            if time_str not in busy_minutes:
                 slots.append(current.time())
             current += timedelta(minutes=30)
         return slots
