@@ -137,7 +137,7 @@ def dashboard():
 
         st.divider()
         st.subheader("Link de Conversão")
-        st.code(f"/?p={profile['slug']}")
+        st.code(f"https://meridian-pulse.streamlit.app/?p={profile['slug']}")
         st.info("💡 Dica Meridian: Sua meta de ocupação para expansão deve ser > 80%.")
 
     elif menu == "🛠 Serviços":
