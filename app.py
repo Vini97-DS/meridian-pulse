@@ -18,7 +18,7 @@ except Exception as e:
 
 # 2. UX & UI CUSTOMIZADA (PADRÃO MERIDIAN)
 # MELHORIA 1: Adicionado parâmetro logo_url — renderiza o logo no topo via HTML se informado
-def apply_custom_style(primary_color="#0D1B2E", secondary_color="#C5A059", text_color="#FFFFFF", logo_url=None):
+def apply_custom_style(primary_color="#0D1B2E", secondary_color="#C0C2C9", text_color="#FFFFFF", logo_url=None):
     logo_html = f'<img src="{logo_url}" style="height:60px; margin-bottom:1rem; display:block;">' if logo_url else ""
     st.markdown(f"""
         <style>
@@ -113,9 +113,9 @@ def dashboard():
     )
     
     st.sidebar.title(f"MERIDIAN | {profile['business_name']}")
-    menu = st.sidebar.radio("Insights & Gestão", ["📊 Performance", "🛠 Serviços", "📅 Agenda", "⚙️ Configurações"])
+    menu = st.sidebar.radio("Insights & Gestão", ["Performance", "Serviços", "Agenda", "Configurações"])
 
-    if menu == "📊 Performance":
+    if menu == "Performance":
         st.title("Business Intelligence")
         
         # Busca dados para o BI
@@ -140,7 +140,7 @@ def dashboard():
         st.code(f"https://meridian-pulse.streamlit.app/?p={profile['slug']}")
         st.info("💡 Dica Meridian: Sua meta de ocupação para expansão deve ser > 80%.")
 
-    elif menu == "🛠 Serviços":
+    elif menu == "Serviços":
         st.title("Gestão de Portfólio")
         col_f, col_l = st.columns([1, 2])
         with col_f:
@@ -160,7 +160,7 @@ def dashboard():
                         supabase.table("services").delete().eq("id", s['id']).execute()
                         st.rerun()
 
-    elif menu == "📅 Agenda":
+    elif menu == "Agenda":
         st.title("Fluxo de Atendimento")
         data = supabase.table("appointments").select("created_at, appointment_time, payment_method, clients(full_name, phone), services(name, duration_minutes)").eq("business_id", user_id).order("appointment_time", desc=True).execute().data
         if data:
@@ -178,7 +178,7 @@ def dashboard():
             st.table(pd.DataFrame(rows))
         else: st.info("Nenhum agendamento.")
 
-    elif menu == "⚙️ Configurações":
+    elif menu == "Configurações":
         st.title("Configurações do Negócio")
         with st.form("config_form"):
             c1, c2 = st.columns(2)
